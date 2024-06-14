@@ -1,0 +1,83 @@
+/* Styles globaux */
+body {
+  font-family: 'Inter', sans-serif; /* Assurez-vous d'utiliser une police agréable */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+header {
+  position: relative; /* La barre de navigation n'est plus fixe */
+  z-index: 50; /* Assurez-vous qu'elle est toujours au-dessus des autres éléments */
+  width: 100%; /* Utilise toute la largeur disponible */
+}
+
+/* Styles pour la barre de navigation en mode modal */
+header.modal-open {
+  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparente */
+}
+
+main {
+  overflow-y: auto; /* Pour permettre le défilement si le contenu est trop long */
+}
+
+/* Styles pour le dropdown */
+#dropdown-user {
+  display: none;
+}
+
+#dropdown-user.show {
+  display: block;
+}
+
+/* Ajuster l'espacement entre les éléments */
+.space-x-4 > * + * {
+  margin-left: 1rem;
+}
+
+/* Styles pour l'avatar et le bouton dropdown */
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.relative {
+  position: relative;
+}
+
+/* Styles pour le menu déroulant au survol */
+.group:hover .group-hover\:block {
+  display: block;
+}
+
+.group-hover\:block {
+  display: none;
+}
+
+/* Styles pour le scrollbar */
+body, main {
+  scrollbar-width: thin !important; /* Pour les navigateurs basés sur Gecko (Firefox) */
+  scrollbar-color: #6C1BAC #f0f0f0 !important; /* Couleur de la scrollbar et de l'arrière-plan */
+}
+
+/* Pour les navigateurs basés sur WebKit (Chrome, Safari) */
+body::-webkit-scrollbar, main::-webkit-scrollbar {
+  width: 12px !important; /* Largeur de la scrollbar */
+  height: 12px !important; /* Hauteur de la scrollbar horizontale */
+}
+
+body::-webkit-scrollbar-track, main::-webkit-scrollbar-track {
+  background: #f0f0f0 !important; /* Couleur de l'arrière-plan */
+}
+
+body::-webkit-scrollbar-thumb, main::-webkit-scrollbar-thumb {
+  background: #6C1BAC !important; /* Couleur violette */
+  border-radius: 10px !important; /* Arrondir les bords */
+  border: 3px solid #f0f0f0 !important; /* Ajouter une bordure pour créer un effet de marge */
+}
+
+/* Custom scrollbar for a cool look */
+body::-webkit-scrollbar-thumb:hover, main::-webkit-scrollbar-thumb:hover {
+  background: #A516C2 !important; /* Couleur au survol */
+}

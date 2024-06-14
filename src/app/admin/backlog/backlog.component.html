@@ -1,0 +1,108 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-4xl font-bold mb-8 text-center text-purple-800">Backlogs Management</h1>
+
+  <!-- Button to open the modal -->
+  <button (click)="openModal()" class="bg-gradient-to-r from-purple-500 to-purple-700 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-1 mb-4">
+    Add Backlog
+  </button>
+
+  <!-- Backlogs Table -->
+  <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <table class="min-w-full bg-white">
+      <thead class="bg-purple-100 text-purple-700">
+        <tr>
+          <th class="py-3 px-6 text-left">TITLE</th>
+          <th class="py-3 px-6 text-left">DESCRIPTION</th>
+          <th class="py-3 px-6 text-left">STATUS</th>
+          <th class="py-3 px-6 text-left">ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let backlog of backlogs">
+          <tr (click)="selectBacklog(backlog)" class="hover:bg-purple-50 cursor-pointer transition-colors">
+            <td class="py-3 px-6">{{ backlog.titre }}</td>
+            <td class="py-3 px-6">{{ backlog.description }}</td>
+            <td class="py-3 px-6">
+              <span [ngClass]="getStatusClass(backlog.etat)">
+                {{ backlog.etat | titlecase }}
+              </span>
+            </td>
+            <td class="py-3 px-6">
+              <button (click)="editBacklog(backlog)" class="text-blue-600 hover:underline mr-2">Edit</button>
+              <button (click)="deleteBacklog(backlog.id!)" class="text-red-600 hover:underline">Delete</button>
+            </td>
+          </tr>
+          <tr *ngIf="selectedBacklog && selectedBacklog.id === backlog.id && showUserStories">
+            <td colspan="4" class="py-3 px-6 bg-gray-50">
+              <h3 class="font-semibold mb-2">User Stories</h3>
+              <ul>
+                <li *ngFor="let userStory of userStories" class="mb-2">
+                  UserStory: {{ userStory.description }}: Priority - {{ userStory.priority }} 
+                </li>
+              </ul>
+              <button (click)="openUserStoryModal()" class="bg-gradient-to-r from-purple-500 to-purple-700 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-1 mt-2">
+                Add User Story
+              </button>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginator -->
+  <mat-paginator [length]="totalElements"
+                 [pageSize]="size"
+                 [pageSizeOptions]="[5, 10, 25, 100]"
+                 (page)="onPageChange($event)">
+  </mat-paginator>
+</div>
+
+<!-- User Story Modal -->
+<div *ngIf="isUserStoryModalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center">
+  <div class="bg-white p-8 rounded-lg shadow-lg transform transition-all scale-95 w-3/4 max-w-2xl">
+    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+      Add User Story
+    </h3>
+    <form [formGroup]="userStoryForm" (ngSubmit)="saveUserStory()">
+      <div class="mb-4">
+        <input formControlName="description" placeholder="Description" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+      </div>
+      <div class="mb-4">
+        <input formControlName="priority" placeholder="Priority" type="number" min="0" max="100" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+      </div>
+      <div class="flex justify-end space-x-2">
+        <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">Save</button>
+        <button type="button" (click)="closeUserStoryModal()" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Backlog Modal -->
+<div *ngIf="isModalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center">
+  <div class="bg-white p-8 rounded-lg shadow-lg transform transition-all scale-95 w-3/4 max-w-2xl">
+    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+      {{ modalTitle }}
+    </h3>
+    <form [formGroup]="backlogForm" (ngSubmit)="saveBacklog()">
+      <div class="mb-4">
+        <input formControlName="titre" placeholder="Title" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+      </div>
+      <div class="mb-4">
+        <textarea formControlName="description" placeholder="Description" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+      </div>
+      <div class="mb-4">
+        <select formControlName="etat" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <option value="TO_DO">À faire</option>
+          <option value="IN_PROGRESS">En cours</option>
+          <option value="DONE">Terminé</option>
+        </select>
+      </div>
+      <div class="flex justify-end space-x-2">
+        <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">Save</button>
+        <button type="button" (click)="closeModal()" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

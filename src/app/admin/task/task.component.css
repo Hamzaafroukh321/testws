@@ -1,0 +1,26 @@
+/* styles.css or task.component.css */
+.select-status {
+    padding: 0.25rem 0.5rem;
+    border: none;
+    background: transparent;
+    font-size: 0.875rem;
+}
+
+.select-status option {
+    padding: 0.25rem 0.5rem;
+}
+
+.option-todo {
+    background-color: #fcdcdc;
+    color: #a50000;
+}
+
+.option-in-progress {
+    background-color: #fff5cc;
+    color: #aa6c00;
+}
+
+.option-done {
+    background-color: #ccf5cc;
+    color: #007a00;
+}

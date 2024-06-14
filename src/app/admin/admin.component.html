@@ -1,0 +1,43 @@
+<div class="flex h-screen">
+  <app-admin-sidebar></app-admin-sidebar>
+  <div class="flex flex-col flex-1">
+    <header [class.modal-open]="isModalOpen" class="w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+      <div class="px-3 py-3 lg:px-5 lg:pl-3 flex justify-end items-center space-x-4">
+        <!-- Icone de notification -->
+        <div class="relative">
+          <svg class="w-6 h-6 text-gray-500 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" (click)="toggleNotificationDropdown()">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405C17.79 14.79 17 13.397 17 12V8c0-3.07-1.64-5.64-4.5-6.32V1c0-.55-.45-1-1-1s-1 .45-1 1v.68C8.64 2.36 7 4.93 7 8v4c0 1.397-.79 2.79-2.595 3.595L3 17h5m7 0v2a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2m6 0H9"></path>
+          </svg>
+          <!-- Dropdown notifications -->
+          <div *ngIf="dropdownVisible" class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg py-1 z-50 dark:bg-gray-700">
+            <div class="px-4 py-2" *ngFor="let notification of notifications">
+              <p class="text-sm text-gray-900 dark:text-white">{{ notification.message }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">{{ notification.timestamp }}</p>
+            </div>
+          </div>
+        </div>
+        <!-- Avatar utilisateur -->
+        <div class="relative group">
+          <button type="button" class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" aria-expanded="false">
+            <span class="sr-only">Open user menu</span>
+            <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white">
+              {{ nom.charAt(0) }}
+            </div>
+          </button>
+          <!-- Dropdown -->
+          <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 dark:bg-gray-700 hidden group-hover:block">
+            <div class="px-4 py-3">
+              <p class="text-sm text-gray-900 dark:text-white">{{ prenom }} {{ nom }}</p>
+              <p class="text-sm font-medium text-gray-900 truncate dark:text-gray-300 mb-2">{{ role }}</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">{{ matricule }}</p>
+            </div>
+            <a href="#" (click)="logout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600">Sign out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="flex-1 p-10 overflow-y-auto">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

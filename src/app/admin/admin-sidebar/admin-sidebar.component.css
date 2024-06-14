@@ -1,0 +1,87 @@
+.sidebar {
+  width: 4rem;
+  transition: width 0.3s;
+}
+
+.sidebar:hover {
+  width: 16rem;
+}
+
+.sidebar .sidebar-text {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.sidebar:hover .sidebar-text {
+  display: inline;
+  opacity: 1;
+}
+
+.custom-icon {
+  width: 24px;
+  height: 24px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* Replace these with your actual icon paths */
+.users-icon {
+  background-image: url('../../../assets/images/management.png');
+}
+
+.permissions-icon {
+  background-image: url('../../../assets/images/shield.png');
+}
+
+.audit-icon {
+  background-image: url('../../../assets/images/audit.png');
+}
+
+.projects-icon {
+  background-image: url('../../../assets/images/project.png');
+}
+
+.leave-icon {
+  background-image: url('../../../assets/images/leave1.png');
+}
+
+.manage-leave-icon {
+  background-image: url('../../../assets/images/leave.png');
+}
+
+.view-project-icon {
+  background-image: url('../../../assets/images/project-management.png');
+}
+
+.assign-tasks-icon {
+  background-image: url('../../../assets/images/task.png');
+}
+
+/* Ajoutez ces classes au fichier CSS existant */
+.chat-icon {
+  background-image: url('../../../assets/images/chat.png');
+}
+
+.manage-task-icon {
+  background-image: url('../../../assets/images/taskmanage.png');
+}
+/* Center icons */
+li {
+  display: flex;
+  justify-content: center;
+}
+
+/* Ensure nested lists are properly indented */
+.sidebar ul ul {
+  padding-left: 1rem;
+}
+
+/* Additional styling for improved appearance */
+.sidebar h3 {
+  margin: 0;
+  padding: 0.5rem 0;
+  text-align: left;
+  width: 100%;
+  padding-left: 1rem; /* Add padding to align the text properly */
+}

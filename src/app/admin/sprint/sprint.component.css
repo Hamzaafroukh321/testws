@@ -1,0 +1,21 @@
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(75, 0, 130, 0.7) rgba(245, 243, 255, 0.5); /* Dark Purple thumb and light track */
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(75, 0, 130, 0.8); /* Dark Purple */
+  border-radius: 4px;
+  border: 2px solid rgba(245, 243, 255, 0.5); /* Light padding around the thumb */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: rgba(245, 243, 255, 0.5);
+  border-radius: 4px;
+}

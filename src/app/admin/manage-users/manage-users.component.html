@@ -1,0 +1,231 @@
+<div class="container mx-auto p-6 bg-gray-50">
+  <h1 class="text-3xl font-extrabold mb-6 text-purple-700">Liste des utilisateurs</h1>
+  <div class="mb-6 flex justify-between items-center">
+    <div class="relative flex-grow mr-4">
+      <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+        </svg>
+      </div>
+      <input type="text" [(ngModel)]="searchTerm" (input)="searchUsers()" placeholder="Rechercher un utilisateur" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-600 focus:border-purple-600 block w-full pl-10 p-2.5">
+    </div>
+    <button (click)="openCreateModal()" class="text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+      Ajouter Utilisateur
+    </button>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm text-left text-gray-600">
+      <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+        <tr>
+          <th scope="col" class="px-6 py-3">Matricule</th>
+          <th scope="col" class="px-6 py-3">Nom complet</th>
+          <th scope="col" class="px-6 py-3">Département</th>
+          <th scope="col" class="px-6 py-3">Email personnel</th>
+          <th scope="col" class="px-6 py-3">Email professionnel</th>
+          <th scope="col" class="px-6 py-3">Téléphone</th>
+          <th scope="col" class="px-6 py-3">Rôles</th>
+          <th scope="col" class="px-6 py-3 text-right">
+            <span class="sr-only">Actions</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers" class="bg-white border-b hover:bg-gray-50">
+          <td class="px-6 py-4">{{ user.matricule }}</td>
+          <td class="px-6 py-4">{{ user.nom }} {{ user.prenom }}</td>
+          <td class="px-6 py-4">{{ user.departement }}</td>
+          <td class="px-6 py-4">{{ user.emailpersonnel }}</td>
+          <td class="px-6 py-4">{{ user.email }}</td>
+          <td class="px-6 py-4">{{ user.tel }}</td>
+          <td class="px-6 py-4">{{ getRoleNames(user.roles) }}</td>
+          <td class="px-6 py-4 text-right">
+            <button (click)="openUpdateModal(user)" class="text-gray-500 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg text-sm p-1.5 inline-flex items-center">
+              <img src="../../../assets/images/modifier-le-fichier.png" alt="Modifier" class="w-6 h-6">
+            </button>
+            <button (click)="openDeleteModal(user)" class="text-gray-500 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg text-sm p-1.5 inline-flex items-center">
+              <img src="../../../assets/images/effacer.png" alt="Supprimer" class="w-6 h-6">
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="mt-6 flex justify-center" *ngIf="totalPages > 1">
+    <nav aria-label="Page navigation">
+      <ul class="inline-flex -space-x-px">
+        <li>
+          <button (click)="previousPage()" [disabled]="currentPage === 1" class="px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+            Précédent
+          </button>
+        </li>
+        <li *ngFor="let page of pages">
+          <button (click)="goToPage(page)" [class.bg-purple-50]="currentPage === page" class="px-3 py-2 leading-tight border border-gray-300 hover:bg-gray-100 hover:text-gray-700">
+            {{ page }}
+          </button>
+        </li>
+        <li>
+          <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+            Suivant
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<!-- Modale de modification -->
+<div id="updateModal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+  <div class="relative w-full max-w-2xl max-h-full">
+    <div class="relative bg-white rounded-lg shadow">
+      <div class="flex items-start justify-between p-4 border-b rounded-t">
+        <h3 class="text-xl font-semibold text-gray-900">
+          Modifier l'utilisateur
+        </h3>
+        <button (click)="closeUpdateModal()" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center">
+          <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-6" *ngIf="selectedUser">
+        <form [formGroup]="userForm">
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label for="nom" class="block mb-2 text-sm font-medium text-gray-900">Nom</label>
+              <input type="text" id="nom" formControlName="nom" [(ngModel)]="selectedUser.nom" name="nom" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5" required>
+              <div *ngIf="userForm.controls['nom'].invalid && (userForm.controls['nom'].dirty || userForm.controls['nom'].touched)" class="text-red-500 text-xs">Nom est requis</div>
+            </div>
+            <div>
+              <label for="prenom" class="block mb-2 text-sm font-medium text-gray-900">Prénom</label>
+              <input type="text" id="prenom" formControlName="prenom" [(ngModel)]="selectedUser.prenom" name="prenom" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5" required>
+              <div *ngIf="userForm.controls['prenom'].invalid && (userForm.controls['prenom'].dirty || userForm.controls['prenom'].touched)" class="text-red-500 text-xs">Prénom est requis</div>
+            </div>
+            <div>
+              <label for="emailpersonnel" class="block mb-2 text-sm font-medium text-gray-900">Email personnel</label>
+              <input type="email" id="emailpersonnel" formControlName="emailpersonnel" [(ngModel)]="selectedUser.emailpersonnel" name="emailpersonnel" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5" required>
+              <div *ngIf="userForm.controls['emailpersonnel'].invalid && (userForm.controls['emailpersonnel'].dirty || userForm.controls['emailpersonnel'].touched)" class="text-red-500 text-xs">Email personnel doit être valide</div>
+            </div>
+            <div>
+              <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Email professionnel</label>
+              <input type="email" id="email" formControlName="email" [(ngModel)]="selectedUser.email" name="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5" required>
+              <div *ngIf="userForm.controls['email'].invalid && (userForm.controls['email'].dirty || userForm.controls['email'].touched)" class="text-red-500 text-xs">Email professionnel doit se terminer par &#64;dxc.com</div>
+            </div>
+            <div>
+              <label for="tel" class="block mb-2 text-sm font-medium text-gray-900">Téléphone</label>
+              <input type="tel" id="tel" formControlName="tel" [(ngModel)]="selectedUser.tel" name="tel" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5">
+              <div *ngIf="userForm.controls['tel'].invalid && (userForm.controls['tel'].dirty || userForm.controls['tel'].touched)" class="text-red-500 text-xs">Téléphone doit être un numéro valide de 10 chiffres</div>
+            </div>
+            <div>
+              <label for="departement" class="block mb-2 text-sm font-medium text-gray-900">Département</label>
+              <input type="text" id="departement" formControlName="departement" [(ngModel)]="selectedUser.departement" name="departement" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5">
+            </div>
+            <div class="mb-4 relative">
+              <label for="roles" class="block mb-2 text-sm font-medium text-gray-900">Rôles</label>
+              <div (click)="toggleRolesDropdown()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 cursor-pointer">Sélectionner les rôles</div>
+              <div [ngClass]="{'hidden': !showRolesDropdown}" class="absolute bg-white border border-gray-300 rounded-lg shadow-lg mt-1 z-10 w-full">
+                <div *ngFor="let role of availableRoles" class="px-4 py-2 hover:bg-gray-100">
+                  <label class="flex items-center">
+                    <input type="checkbox" [value]="role" (change)="onRoleChange($event)" [checked]="selectedUser.roles.includes(role)" class="form-checkbox text-purple-600 rounded focus:ring-purple-500 focus:border-purple-500">
+                    <span class="ml-2 text-sm text-gray-700">{{ role }}</span>
+                  </label>
+                </div>
+              </div>
+              <div *ngIf="userForm.controls['roles'].invalid && (userForm.controls['roles'].dirty || userForm.controls['roles'].touched)" class="text-red-500 text-xs">Au moins un rôle doit être sélectionné</div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b">
+        <button (click)="updateUser()" type="button" class="text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Enregistrer</button>
+        <button (click)="closeUpdateModal()" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-purple-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10">Annuler</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modale de suppression -->
+<div id="deleteModal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+  <div class="relative w-full max-w-md max-h-full">
+    <div class="relative bg-white rounded-lg shadow">
+      <button (click)="closeDeleteModal()" type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center">
+        <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+        <span class="sr-only">Fermer la modale</span>
+      </button>
+      <div class="p-6 text-center">
+        <svg aria-hidden="true" class="mx-auto mb-4 text-gray-400 w-14 h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <h3 class="mb-5 text-lg font-normal text-gray-500">Êtes-vous sûr de vouloir supprimer cet utilisateur ?</h3>
+        <button (click)="deleteUser()" type="button" class="text-white bg-purple-600 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+          Oui, supprimer
+        </button>
+        <button (click)="closeDeleteModal()" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10">Non, annuler</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modale de création -->
+<div id="createModal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+  <div class="relative w-full max-w-2xl max-h-full">
+    <div class="relative bg-white rounded-lg shadow">
+      <div class="flex items-start justify-between p-4 border-b rounded-t">
+        <h3 class="text-xl font-semibold text-gray-900">
+          Ajouter un utilisateur
+        </h3>
+        <button (click)="closeCreateModal()" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center">
+          <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-6">
+        <form [formGroup]="userForm">
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label for="nom" class="block mb-2 text-sm font-medium text-gray-900">Nom</label>
+              <input type="text" id="nom" formControlName="nom" [(ngModel)]="newUser.nom" name="nom" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5" required>
+              <div *ngIf="userForm.controls['nom'].invalid && (userForm.controls['nom'].dirty || userForm.controls['nom'].touched)" class="text-red-500 text-xs">Nom est requis</div>
+            </div>
+            <div>
+              <label for="prenom" class="block mb-2 text-sm font-medium text-gray-900">Prénom</label>
+              <input type="text" id="prenom" formControlName="prenom" [(ngModel)]="newUser.prenom" name="prenom" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5" required>
+              <div *ngIf="userForm.controls['prenom'].invalid && (userForm.controls['prenom'].dirty || userForm.controls['prenom'].touched)" class="text-red-500 text-xs">Prénom est requis</div>
+            </div>
+            <div>
+              <label for="emailpersonnel" class="block mb-2 text-sm font-medium text-gray-900">Email personnel</label>
+              <input type="email" id="emailpersonnel" formControlName="emailpersonnel" [(ngModel)]="newUser.emailpersonnel" name="emailpersonnel" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5" required>
+              <div *ngIf="userForm.controls['emailpersonnel'].invalid && (userForm.controls['emailpersonnel'].dirty || userForm.controls['emailpersonnel'].touched)" class="text-red-500 text-xs">Email personnel doit être valide</div>
+            </div>
+            <div>
+              <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Email professionnel</label>
+              <input type="email" id="email" formControlName="email" [(ngModel)]="newUser.email" name="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5" required>
+              <div *ngIf="userForm.controls['email'].invalid && (userForm.controls['email'].dirty || userForm.controls['email'].touched)" class="text-red-500 text-xs">Email professionnel doit se terminer par &#64;dxc.com</div>
+            </div>
+            <div>
+              <label for="tel" class="block mb-2 text-sm font-medium text-gray-900">Téléphone</label>
+              <input type="tel" id="tel" formControlName="tel" [(ngModel)]="newUser.tel" name="tel" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5" required>
+              <div *ngIf="userForm.controls['tel'].invalid && (userForm.controls['tel'].dirty || userForm.controls['tel'].touched)" class="text-red-500 text-xs">Téléphone doit être un numéro valide de 10 chiffres</div>
+            </div>
+            <div>
+              <label for="departement" class="block mb-2 text-sm font-medium text-gray-900">Département</label>
+              <input type="text" id="departement" formControlName="departement" [(ngModel)]="newUser.departement" name="departement" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5" required>
+              <div *ngIf="userForm.controls['departement'].invalid && (userForm.controls['departement'].dirty || userForm.controls['departement'].touched)" class="text-red-500 text-xs">Département est requis</div>
+            </div>
+            <div class="mb-4 relative">
+              <label for="roles" class="block mb-2 text-sm font-medium text-gray-900">Rôles</label>
+              <div (click)="toggleRolesDropdown()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 cursor-pointer">Sélectionner les rôles</div>
+              <div [ngClass]="{'hidden': !showRolesDropdown}" class="absolute bg-white border border-gray-300 rounded-lg shadow-lg mt-1 z-10 w-full">
+                <div *ngFor="let role of availableRoles" class="px-4 py-2 hover:bg-gray-100">
+                  <label class="flex items-center">
+                    <input type="checkbox" [value]="role" (change)="onRoleChange($event)" [checked]="newUser.roles.includes(role)" class="form-checkbox text-purple-600 rounded focus:ring-purple-500 focus:border-purple-500">
+                    <span class="ml-2 text-sm text-gray-700">{{ role }}</span>
+                  </label>
+                </div>
+              </div>
+              <div *ngIf="userForm.controls['roles'].invalid && (userForm.controls['roles'].dirty || userForm.controls['roles'].touched)" class="text-red-500 text-xs">Au moins un rôle doit être sélectionné</div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b">
+        <button (click)="createUser()" type="button" class="text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Ajouter</button>
+        <button (click)="closeCreateModal()" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-purple-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10">Annuler</button>
+      </div>
+    </div>
+  </div>
+</div>

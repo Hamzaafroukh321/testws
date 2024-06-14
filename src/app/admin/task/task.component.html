@@ -1,0 +1,50 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-4xl font-bold mb-8 text-center text-purple-800">My Tasks</h1>
+
+  <div class="mb-4">
+      <select [formControl]="statusControl" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <option value="">All Statuses</option>
+          <option *ngFor="let status of taskStatuses" [value]="status">{{ status }}</option>
+      </select>
+  </div>
+
+  <div *ngIf="filteredTasks.length === 0" class="text-center text-gray-500">
+      No tasks found.
+  </div>
+
+  <div *ngIf="filteredTasks.length > 0" class="bg-white shadow-lg rounded-lg overflow-hidden">
+      <table class="min-w-full bg-white">
+          <thead class="bg-purple-100 text-purple-700">
+              <tr>
+                  <th class="py-3 px-6 text-left">DESCRIPTION</th>
+                  <th class="py-3 px-6 text-left">STATUS</th>
+                  <th class="py-3 px-6 text-left">SPRINT ID</th>
+                  <th class="py-3 px-6 text-left">ASSIGNED TO</th>
+                  <th class="py-3 px-6 text-left">ACTIONS</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr *ngFor="let task of filteredTasks" class="hover:bg-purple-50 cursor-pointer transition-colors">
+                  <td class="py-3 px-6">{{ task.description }}</td>
+                  <td class="py-3 px-6">
+                      <span [ngClass]="getStatusClass(task.status)" class="inline-block">
+                          <select [ngModel]="task.status" (change)="updateTaskStatus(task.id, $event)" class="border-none bg-transparent focus:ring-0 text-sm">
+                              <option *ngFor="let status of taskStatuses" [value]="status">{{ status }}</option>
+                          </select>
+                      </span>
+                  </td>
+                  <td class="py-3 px-6">{{ task.sprintId }}</td>
+                  <td class="py-3 px-6">{{ task.assignedToMatricule }}</td>
+                  <td class="py-3 px-6">
+                      <!-- Add more actions if needed -->
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+  </div>
+
+  <div class="mt-4 flex justify-between">
+      <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 0" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-700">Previous</button>
+      <button (click)="onPageChange(currentPage + 1)" [disabled]="(currentPage + 1) * pageSize >= totalElements" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-700">Next</button>
+  </div>
+</div>

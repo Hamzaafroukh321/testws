@@ -1,0 +1,86 @@
+<div class="sidebar bg-purple-800 h-screen text-white">
+  <div class="flex flex-col items-center py-4">
+    <div class="mb-6">
+      <img src="../../../assets/images/dxclogo.png" alt="Logo" class="h-10 w-10 rounded-full">
+    </div>
+
+    <ul class="w-full mt-4">
+      <li *ngIf="hasPermission('MANAGE_USERS')" class="flex items-center px-4 py-2 hover:bg-purple-700">
+        <a routerLink="/admin/manage-users" class="flex items-center w-full">
+          <i class="custom-icon users-icon"></i>
+          <span class="sidebar-text ml-2">Manage Users</span>
+        </a>
+      </li>
+      <li *ngIf="hasPermission('MANAGE_PERMISSIONS')" class="flex items-center px-4 py-2 hover:bg-purple-700">
+        <a routerLink="/admin/manage-permissions" class="flex items-center w-full">
+          <i class="custom-icon permissions-icon"></i>
+          <span class="sidebar-text ml-2">Manage Permissions</span>
+        </a>
+      </li>
+      <li *ngIf="hasPermission('MANAGE_AUDIT')" class="flex items-center px-4 py-2 hover:bg-purple-700">
+        <a routerLink="/admin/manage-audit" class="flex items-center w-full">
+          <i class="custom-icon audit-icon"></i>
+          <span class="sidebar-text ml-2">Manage Audit</span>
+        </a>
+      </li>
+      <li *ngIf="hasPermission('MANAGE_PROJECTS')" class="flex items-center px-4 py-2 hover:bg-purple-700">
+        <a routerLink="/admin/manage-projects" class="flex items-center w-full">
+          <i class="custom-icon projects-icon"></i>
+          <span class="sidebar-text ml-2">Manage Projects</span>
+        </a>
+      </li>
+      <li *ngIf="hasPermission('REQUEST_LEAVE')" class="flex items-center px-4 py-2 hover:bg-purple-700">
+        <a routerLink="/admin/request-leave" class="flex items-center w-full">
+          <i class="custom-icon leave-icon"></i>
+          <span class="sidebar-text ml-2">Request Leave</span>
+        </a>
+      </li>
+      <li *ngIf="hasPermission('MANAGE_REQUEST_LEAVE')" class="flex items-center px-4 py-2 hover:bg-purple-700">
+        <a routerLink="/admin/manage-leave-request" class="flex items-center w-full">
+          <i class="custom-icon manage-leave-icon"></i>
+          <span class="sidebar-text ml-2">Manage Leave Request</span>
+        </a>
+      </li>
+      <li *ngIf="hasPermission('MANAGE_TASKS')" class="flex items-center px-4 py-2 hover:bg-purple-700">
+        <a routerLink="/admin/manage-tasks" class="flex items-center w-full">
+          <i class="custom-icon manage-task-icon"></i>
+          <span class="sidebar-text ml-2">Manage Tasks</span>
+        </a>
+      </li>
+      <li *ngIf="hasPermission('CHAT_MESSAGE')" class="flex items-center px-4 py-2 hover:bg-purple-700">
+        <a routerLink="/admin/chat" class="flex items-center w-full">
+          <i class="custom-icon chat-icon"></i>
+          <span class="sidebar-text ml-2">Chat</span>
+        </a>
+      </li>
+    </ul>
+
+    <div *ngIf="canViewProjects()" class="w-full">
+      <h3 class="mt-4 text-lg sidebar-text pl-4">Mes Projets</h3>
+      <ul class="w-full mt-2">
+        <li *ngFor="let project of projects" class="flex flex-col">
+          <div class="flex items-center px-4 py-2 hover:bg-purple-700">
+            <a [routerLink]="['/admin/project', project.id]" class="flex items-center w-full">
+              <i class="custom-icon projects-icon"></i>
+              <span class="sidebar-text ml-2">{{ project.nom }}</span>
+            </a>
+          </div>
+          <ul class="pl-8">
+            <li class="flex items-center px-4 py-2 hover:bg-purple-700">
+              <a [routerLink]="['/admin/project', project.id, 'backlogs']" class="flex items-center w-full">
+                <i class="custom-icon backlog-icon"></i>
+                <span class="sidebar-text ml-2">Backlogs</span>
+              </a>
+            </li>
+            <li class="flex items-center px-4 py-2 hover:bg-purple-700">
+              <a [routerLink]="['/admin/project', project.id, 'sprints']" class="flex items-center w-full">
+                <i class="custom-icon sprint-icon"></i>
+                <span class="sidebar-text ml-2">Sprints</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

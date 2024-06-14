@@ -1,0 +1,26 @@
+<div class="chat-container">
+  <div class="chat-sidebar">
+    <h3>Conversations Archivées</h3>
+    <ul>
+      <li *ngFor="let conv of archivedConversations" (click)="selectRecipient(conv.userId)">
+        Conversation avec {{ conv.userId }}
+      </li>
+    </ul>
+  </div>
+  <div class="chat-main">
+    <div class="chat-header">
+      <input type="text" placeholder="Matricule du destinataire" [(ngModel)]="recipientId" />
+      <button (click)="loadMessages()">Charger l'historique</button>
+    </div>
+    <div class="chat-messages">
+      <div *ngFor="let message of messages" class="chat-message" [ngClass]="{'sent': message.senderId === userMatricule, 'received': message.senderId !== userMatricule}">
+        <p>{{ message.content }}</p>
+        <span>{{ message.timestamp | date:'short' }}</span>
+      </div>
+    </div>
+    <div class="chat-input">
+      <input type="text" placeholder="Entrez votre message" [(ngModel)]="newMessage" />
+      <button (click)="sendMessage()">Envoyer</button>
+    </div>
+  </div>
+</div>

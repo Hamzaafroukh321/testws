@@ -1,0 +1,207 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-4xl font-bold mb-8 text-center text-purple-800">Sprints Management</h1>
+
+  <!-- Button to open the modal -->
+  <button (click)="openSprintModal()" class="bg-gradient-to-r from-purple-500 to-purple-700 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-1 mb-4">
+    Add Sprint
+  </button>
+
+  <!-- Sprints Table -->
+  <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
+    <table class="min-w-full bg-white">
+      <thead class="bg-purple-100 text-purple-700">
+        <tr>
+          <th class="py-3 px-6 text-left">NAME</th>
+          <th class="py-3 px-6 text-left">START DATE</th>
+          <th class="py-3 px-6 text-left">END DATE</th>
+          <th class="py-3 px-6 text-left">ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let sprint of sprints" (click)="selectSprint(sprint)" class="hover:bg-purple-50 cursor-pointer transition-colors">
+          <td class="py-3 px-6">{{ sprint.nom }}</td>
+          <td class="py-3 px-6">{{ sprint.dateDebut }}</td>
+          <td class="py-3 px-6">{{ sprint.dateFin }}</td>
+          <td class="py-3 px-6">
+            <button (click)="editSprint(sprint, $event)" class="text-blue-600 hover:underline mr-2">Edit</button>
+            <button (click)="deleteSprint(sprint.id!, $event)" class="text-red-600 hover:underline">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginator -->
+  <mat-paginator [length]="totalElements"
+                 [pageSize]="size"
+                 [pageSizeOptions]="[5, 10, 25, 100]"
+                 (page)="onPageChange($event)">
+  </mat-paginator>
+</div>
+
+<!-- Sprint Modal -->
+<div *ngIf="isSprintModalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center">
+  <div class="bg-white p-8 rounded-lg shadow-lg transform transition-all scale-95 w-3/4 max-w-2xl">
+    <h3 class="text-2xl font-bold mb-4">{{ modalTitle }}</h3>
+    <form [formGroup]="sprintForm" (ngSubmit)="saveSprint()">
+      <div class="mb-4">
+        <label for="nom" class="block text-gray-700">Sprint Name</label>
+        <input formControlName="nom" id="nom" placeholder="Sprint Name" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+        <div *ngIf="sprintForm.get('nom')?.invalid && sprintForm.get('nom')?.touched" class="text-red-500 text-sm mt-1">
+          Sprint name is required and should be at least 3 characters.
+        </div>
+      </div>
+      <div class="mb-4">
+        <label for="dateDebut" class="block text-gray-700">Start Date</label>
+        <input formControlName="dateDebut" id="dateDebut" type="date" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+        <div *ngIf="sprintForm.get('dateDebut')?.invalid && sprintForm.get('dateDebut')?.touched" class="text-red-500 text-sm mt-1">
+          Start date is required and cannot be in the past.
+        </div>
+      </div>
+      <div class="mb-4">
+        <label for="dateFin" class="block text-gray-700">End Date</label>
+        <input formControlName="dateFin" id="dateFin" type="date" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+        <div *ngIf="sprintForm.get('dateFin')?.invalid && sprintForm.get('dateFin')?.touched" class="text-red-500 text-sm mt-1">
+          End date is required and must be after start date.
+        </div>
+      </div>
+      <div class="flex justify-end space-x-2">
+        <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">Save</button>
+        <button type="button" (click)="closeSprintModal()" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Sprint Tasks Modal -->
+<div *ngIf="isSprintTasksModalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center">
+  <div class="bg-white p-8 rounded-lg shadow-lg transform transition-all scale-95 w-3/4 max-w-4xl">
+    <h3 class="text-2xl font-bold mb-4">Tasks for {{ selectedSprint?.nom }}</h3>
+    <div class="overflow-y-auto custom-scrollbar" style="max-height: 400px;">
+      <table class="min-w-full bg-white">
+        <thead class="bg-purple-100 text-purple-700">
+          <tr>
+            <th class="py-3 px-6 text-left">DESCRIPTION</th>
+            <th class="py-3 px-6 text-left">STATUS</th>
+            <th class="py-3 px-6 text-left">ASSIGNED TO</th>
+            <th class="py-3 px-6 text-left">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let task of tasks" class="hover:bg-purple-50 cursor-pointer transition-colors">
+            <td class="py-3 px-6">{{ task.description }}</td>
+            <td class="py-3 px-6">
+              <span [ngClass]="getStatusClass(task.status)">
+                {{ task.status }}
+              </span>
+            </td>
+            <td class="py-3 px-6">{{ task.assignedToMatricule }}</td>
+            <td class="py-3 px-6">
+              <button (click)="editTask(task, $event)" class="text-blue-600 hover:underline mr-2">Edit</button>
+              <button (click)="deleteTask(task.id!, $event)" class="text-red-600 hover:underline">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="flex justify-end mt-4">
+      <button (click)="openTaskModal()" class="bg-gradient-to-r from-purple-500 to-purple-700 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-1 mr-2">
+        Add Task
+      </button>
+      <button (click)="closeSprintTasksModal()" class="bg-gray-600 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-1">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Task Modal -->
+<div *ngIf="isTaskModalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center">
+  <div class="bg-white p-8 rounded-lg shadow-lg transform transition-all scale-95 w-3/4 max-w-xl">
+    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+      Add Task
+    </h3>
+    <form [formGroup]="taskForm" (ngSubmit)="saveTask()">
+      <div class="mb-4">
+        <select formControlName="backlogId" (change)="onBacklogChange($event)" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <option *ngFor="let backlog of projectBacklogs" [value]="backlog.id">{{ backlog.titre }}</option>
+        </select>
+        <div *ngIf="taskForm.get('backlogId')?.invalid && taskForm.get('backlogId')?.touched" class="text-red-500 text-sm mt-1">
+          Backlog is required.
+        </div>
+      </div>
+      <div class="mb-4">
+        <select formControlName="userStoryId" (change)="onUserStoryChange($event)" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <option *ngFor="let userStory of backlogUserStories" [value]="userStory.id">{{ userStory.description }}</option>
+        </select>
+        <div *ngIf="taskForm.get('userStoryId')?.invalid && taskForm.get('userStoryId')?.touched" class="text-red-500 text-sm mt-1">
+          User story is required.
+        </div>
+      </div>
+      <div class="mb-4">
+        <input formControlName="description" placeholder="Description" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" >
+        <div *ngIf="taskForm.get('description')?.invalid && taskForm.get('description')?.touched" class="text-red-500 text-sm mt-1">
+          Description is required.
+        </div>
+      </div>
+      <div class="mb-4">
+        <select formControlName="status" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <option *ngFor="let status of taskStatuses" [value]="status">{{ status }}</option>
+        </select>
+        <div *ngIf="taskForm.get('status')?.invalid && taskForm.get('status')?.touched" class="text-red-500 text-sm mt-1">
+          Status is required.
+        </div>
+      </div>
+      <div class="mb-4">
+        <select formControlName="assignedToEmail" (change)="onEmailChange($event)" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <option *ngFor="let member of teamMembers" [value]="member.email">{{ member.email }}</option>
+        </select>
+        <div *ngIf="taskForm.get('assignedToEmail')?.invalid && taskForm.get('assignedToEmail')?.touched" class="text-red-500 text-sm mt-1">
+          User email is required.
+        </div>
+      </div>
+      
+      <div class="flex justify-end space-x-2">
+        <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">Save</button>
+        <button type="button" (click)="closeTaskModal()" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Task Modal -->
+<div *ngIf="isEditTaskModalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center">
+  <div class="bg-white p-8 rounded-lg shadow-lg transform transition-all scale-95 w-3/4 max-w-xl">
+    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+      Edit Task
+    </h3>
+    <form [formGroup]="taskForm" (ngSubmit)="saveTask()">
+      <div class="mb-4">
+        <input formControlName="description" placeholder="Description" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+        <div *ngIf="taskForm.get('description')?.invalid && taskForm.get('description')?.touched" class="text-red-500 text-sm mt-1">
+          Description is required.
+        </div>
+      </div>
+      <div class="mb-4">
+        <select formControlName="status" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <option *ngFor="let status of taskStatuses" [value]="status">{{ status }}</option>
+        </select>
+        <div *ngIf="taskForm.get('status')?.invalid && taskForm.get('status')?.touched" class="text-red-500 text-sm mt-1">
+          Status is required.
+        </div>
+      </div>
+      <div class="mb-4">
+        <select formControlName="assignedToEmail" (change)="onEmailChange($event)" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <option *ngFor="let member of teamMembers" [value]="member.email">{{ member.email }}</option>
+        </select>
+        <div *ngIf="taskForm.get('assignedToEmail')?.invalid && taskForm.get('assignedToEmail')?.touched" class="text-red-500 text-sm mt-1">
+          User email is required.
+        </div>
+      </div>
+      <div class="flex justify-end space-x-2">
+        <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">Save</button>
+        <button type="button" (click)="closeEditTaskModal()" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

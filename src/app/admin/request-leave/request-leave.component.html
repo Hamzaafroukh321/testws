@@ -1,0 +1,81 @@
+<div class="container mx-auto p-4">
+  <h1 class="text-3xl font-bold mb-4 text-purple-700">Gestion des Congés</h1>
+  
+  <!-- Button to open the modal -->
+  <button class="bg-purple-700 text-white hover:bg-purple-800 font-bold py-2 px-4 rounded mb-4" (click)="openModal()">Demander un Congé</button>
+  
+  <!-- Message d'erreur -->
+  <div *ngIf="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
+  
+  <!-- Modal pour demander un congé -->
+  <div id="modal-add" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full flex items-center justify-center">
+    <div class="relative w-full max-w-2xl max-h-full">
+      <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+        <!-- Modal header -->
+        <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+          <h3 class="text-xl font-semibold text-purple-700 dark:text-white">
+            Demander un Congé
+          </h3>
+          <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" (click)="closeModal()">
+            <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+            </svg>
+          </button>
+        </div>
+        <!-- Modal body -->
+        <div class="p-6 space-y-6">
+          <form [formGroup]="leaveForm" (ngSubmit)="onSubmit()">
+            <div class="mb-4">
+              <label for="startDate" class="block text-gray-700 text-sm font-bold mb-2">Date de Début :</label>
+              <input type="date" id="startDate" formControlName="startDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              <div *ngIf="leaveForm.get('startDate')!.invalid && leaveForm.get('startDate')!.touched" class="text-red-500 text-sm">Date de début est requise et ne peut pas être dans le passé.</div>
+            </div>
+            <div class="mb-4">
+              <label for="endDate" class="block text-gray-700 text-sm font-bold mb-2">Date de Fin :</label>
+              <input type="date" id="endDate" formControlName="endDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              <div *ngIf="leaveForm.get('endDate')!.invalid && leaveForm.get('endDate')!.touched" class="text-red-500 text-sm">Date de fin est requise et doit être après la date de début.</div>
+            </div>
+            <div class="mb-4">
+              <label for="remplacantMatricule" class="block text-gray-700 text-sm font-bold mb-2">Matricule du Remplaçant :</label>
+              <input type="text" id="remplacantMatricule" formControlName="remplacantMatricule" list="remplacantMatriculesList" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              <datalist id="remplacantMatriculesList">
+                <option *ngFor="let matricule of (filteredRemplacantMatricules | async)" [value]="matricule">{{ matricule }}</option>
+              </datalist>
+              <div *ngIf="leaveForm.get('remplacantMatricule')!.invalid && leaveForm.get('remplacantMatricule')!.touched" class="text-red-500 text-sm">Matricule du remplaçant est requis.</div>
+              <div *ngIf="remplacantMatriculeErrorMessage" class="text-red-500 text-sm">{{ remplacantMatriculeErrorMessage }}</div>
+            </div>
+            <div class="flex items-center justify-between">
+              <button type="submit" class="bg-purple-700 text-white hover:bg-purple-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Demander</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Liste des congés -->
+  <div class="overflow-x-auto relative shadow-md sm:rounded-lg">
+    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+      <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <tr>
+          <th scope="col" class="py-3 px-6">Date de Début</th>
+          <th scope="col" class="py-3 px-6">Date de Fin</th>
+          <th scope="col" class="py-3 px-6">Statut</th>
+          <th scope="col" class="py-3 px-6">Remplaçant Matricule</th>
+          <th scope="col" class="py-3 px-6">Motif</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let conge of congees" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+          <td class="py-4 px-6">{{ conge.dateDebut ? (getDateForDisplay(conge.dateDebut) | date: 'dd/MM/yyyy') : 'Date invalide' }}</td>
+          <td class="py-4 px-6">{{ conge.dateFin ? (getDateForDisplay(conge.dateFin) | date: 'dd/MM/yyyy') : 'Date invalide' }}</td>
+          <td class="py-4 px-6" [ngClass]="{'text-purple-500': conge.status === 'PENDING', 'text-green-500': conge.status === 'APPROVED', 'text-red-500': conge.status === 'REJECTED'}">
+            {{ conge.status === 'PENDING' ? 'En attente' : conge.status === 'APPROVED' ? 'Accepté' : 'Refusé' }}
+          </td>
+          <td class="py-4 px-6">{{ conge.remplacantMatricule }}</td>
+          <td class="py-4 px-6">{{ conge.motif }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

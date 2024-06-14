@@ -1,0 +1,21 @@
+/* Ajuster la position et le style de la barre de navigation */
+nav {
+    width: calc(100% - 60px); /* Ajustez cette valeur selon la largeur de votre barre latérale */
+    right: 0;
+    background-color: white; /* Assure que le fond de la barre de navigation est blanc */
+  }
+  
+  /* Styles pour le dropdown */
+  #dropdown-user {
+    display: none;
+  }
+  
+  #dropdown-user.show {
+    display: block;
+  }
+  
+  /* Ajuster l'espacement entre les éléments */
+  .space-x-4 > * + * {
+    margin-left: 1rem;
+  }
+  

@@ -1,0 +1,207 @@
+<div class="container mx-auto p-4">
+  <h1 class="text-3xl font-bold mb-4 text-purple-700">Gestion des Projets</h1>
+
+  <!-- Button to open the modal -->
+  <button class="bg-purple-700 text-white hover:bg-purple-800 font-bold py-2 px-4 rounded mb-4" (click)="openModal('add')">Ajouter un Projet</button>
+
+  <!-- Message d'erreur -->
+
+  <button class="bg-green-700 text-white hover:bg-green-800 font-bold py-2 px-4 rounded mb-4 ml-4" (click)="exportToExcel()">
+    <img src="../../../assets/images/excel-icon.png" alt="Export to Excel" class="inline-block h-6 w-6">
+    Exporter vers Excel
+  </button>
+
+ 
+<!-- Modal pour ajouter un projet -->
+<div id="modal-add" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full flex items-center justify-center">
+  <div class="relative w-full max-w-2xl max-h-full">
+    <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+      <!-- Modal header -->
+      <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+        <h3 class="text-xl font-semibold text-purple-700 dark:text-white">
+          Ajouter un Projet
+        </h3>
+        <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" (click)="closeModal('add')">
+          <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+          </svg>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div class="p-6 space-y-6">
+        <form [formGroup]="projetForm" (ngSubmit)="onSubmit()">
+          <div class="mb-4">
+            <label for="nom" class="block text-gray-700 text-sm font-bold mb-2">Nom du Projet :</label>
+            <input type="text" id="nom" formControlName="nom" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            <div *ngIf="projetForm.get('nom')!.invalid && projetForm.get('nom')!.touched" class="text-red-500 text-sm">Nom est requis.</div>
+          </div>
+          <div class="mb-4">
+            <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Description :</label>
+            <textarea id="description" formControlName="description" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+            <div *ngIf="projetForm.get('description')!.invalid && projetForm.get('description')!.touched" class="text-red-500 text-sm">Description est requise.</div>
+          </div>
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label for="dateDebut" class="block text-gray-700 text-sm font-bold mb-2">Date de Début :</label>
+              <input type="date" id="dateDebut" formControlName="dateDebut" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              <div *ngIf="projetForm.get('dateDebut')!.invalid && projetForm.get('dateDebut')!.touched" class="text-red-500 text-sm">Date de début est requise et ne peut pas être dans le passé.</div>
+            </div>
+            <div>
+              <label for="dateFin" class="block text-gray-700 text-sm font-bold mb-2">Date de Fin :</label>
+              <input type="date" id="dateFin" formControlName="dateFin" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              <div *ngIf="projetForm.get('dateFin')!.invalid && projetForm.get('dateFin')!.touched" class="text-red-500 text-sm">Date de fin est requise et doit être après la date de début.</div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label for="mode" class="block text-gray-700 text-sm font-bold mb-2">Mode :</label>
+              <select id="mode" formControlName="mode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <option value="Dev">Dev</option>
+                <option value="Test">Test</option>
+                <option value="Prod">Prod</option>
+                <option value="Maintenance">Maintenance</option>
+              </select>
+              <div *ngIf="projetForm.get('mode')!.invalid && projetForm.get('mode')!.touched" class="text-red-500 text-sm">Mode est requis.</div>
+            </div>
+            <div>
+              <label for="status" class="block text-gray-700 text-sm font-bold mb-2">Status :</label>
+              <select id="status" formControlName="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <option value="En cours">En cours</option>
+                <option value="Terminé">Terminé</option>
+              </select>
+              <div *ngIf="projetForm.get('status')!.invalid && projetForm.get('status')!.touched" class="text-red-500 text-sm">Status est requis.</div>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label for="chefMatricule" class="block text-gray-700 text-sm font-bold mb-2">Chef Matricule :</label>
+            <input type="text" id="chefMatricule" formControlName="chefMatricule" list="chefMatricules" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            <datalist id="chefMatricules">
+              <option *ngFor="let matricule of (filteredChefMatricules | async)" [value]="matricule">{{ matricule }}</option>
+            </datalist>
+            <div *ngIf="projetForm.get('chefMatricule')!.invalid && projetForm.get('chefMatricule')!.touched" class="text-red-500 text-sm">Chef Matricule est requis.</div>
+            <div *ngIf="chefMatriculeErrorMessage" class="text-red-500 text-sm">{{ chefMatriculeErrorMessage }}</div>
+          </div>
+          
+          <div class="mb-4">
+            <label for="teamMembersMatricules" class="block text-gray-700 text-sm font-bold mb-2">Membres de l'équipe (Matricules) :</label>
+            <input type="text" id="teamMembersMatricules" formControlName="teamMembersMatricules" list="teamMembersMatriculesList" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Séparés par des virgules">
+            <datalist id="teamMembersMatriculesList">
+              <option *ngFor="let matricule of (filteredTeamMembersMatricules | async)" [value]="matricule">{{ matricule }}</option>
+            </datalist>
+            <div *ngIf="projetForm.get('teamMembersMatricules')!.invalid && projetForm.get('teamMembersMatricules')!.touched" class="text-red-500 text-sm">Membres de l'équipe est requis.</div>
+            <div *ngIf="teamMembersErrorMessage" class="text-red-500 text-sm">{{ teamMembersErrorMessage }}</div>
+          </div>
+          
+          <div class="flex items-center justify-between">
+            <button type="submit" class="bg-purple-700 text-white hover:bg-purple-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Ajouter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour éditer un projet -->
+<div id="modal-edit" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full flex items-center justify-center">
+  <div class="relative w-full max-w-2xl max-h-full">
+    <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+      <!-- Modal header -->
+      <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+        <h3 class="text-xl font-semibold text-purple-700 dark:text-white">
+          Modifier un Projet
+        </h3>
+        <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" (click)="closeModal('edit')">
+          <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+          </svg>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div class="p-6 space-y-6">
+        <form [formGroup]="editForm" (ngSubmit)="onEditSubmit()">
+          <div class="mb-4">
+            <label for="editMode" class="block text-gray-700 text-sm font-bold mb-2">Mode :</label>
+            <select id="editMode" formControlName="mode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              <option value="Dev">Dev</option>
+              <option value="Test">Test</option>
+              <option value="Prod">Prod</option>
+              <option value="Maintenance">Maintenance</option>
+            </select>
+            <div *ngIf="editForm.get('mode')!.invalid && editForm.get('mode')!.touched" class="text-red-500 text-sm">Mode est requis.</div>
+          </div>
+          <div class="mb-4">
+            <label for="editStatus" class="block text-gray-700 text-sm font-bold mb-2">Status :</label>
+            <select id="editStatus" formControlName="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              <option value="En cours">En cours</option>
+              <option value="Terminé">Terminé</option>
+            </select>
+            <div *ngIf="editForm.get('status')!.invalid && editForm.get('status')!.touched" class="text-red-500 text-sm">Status est requis.</div>
+          </div>
+          <div class="mb-4">
+            <label for="editDateFin" class="block text-gray-700 text-sm font-bold mb-2">Date de Fin :</label>
+            <input type="date" id="editDateFin" formControlName="dateFin" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            <div *ngIf="editForm.get('dateFin')!.invalid && editForm.get('dateFin')!.touched" class="text-red-500 text-sm">Date de fin est requise et doit être après la date de début.</div>
+          </div>
+          <div class="mb-4">
+            <label for="editChefMatricule" class="block text-gray-700 text-sm font-bold mb-2">Chef de Matricule :</label>
+            <input type="text" id="editChefMatricule" formControlName="chefMatricule" list="chefMatriculeList" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Matricule du chef">
+            <datalist id="chefMatriculeList">
+              <option *ngFor="let matricule of (filteredChefMatricules | async)" [value]="matricule">{{ matricule }}</option>
+            </datalist>
+            <div *ngIf="editForm.get('chefMatricule')!.invalid && editForm.get('chefMatricule')!.touched" class="text-red-500 text-sm">Chef de Matricule est requis.</div>
+          </div>
+          <div class="mb-4">
+            <label for="editTeamMembers" class="block text-gray-700 text-sm font-bold mb-2">Membres de l'équipe (Matricules) :</label>
+            <input type="text" id="editTeamMembers" formControlName="teamMembersMatricules" list="teamMembersMatriculesList" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Séparés par des virgules">
+            <datalist id="teamMembersMatriculesList">
+              <option *ngFor="let matricule of (filteredTeamMembersMatricules | async)" [value]="matricule">{{ matricule }}</option>
+            </datalist>
+            <div *ngIf="editForm.get('teamMembersMatricules')!.invalid && editForm.get('teamMembersMatricules')!.touched" class="text-red-500 text-sm">Membres de l'équipe est requis.</div>
+            <div *ngIf="teamMembersErrorMessage" class="text-red-500 text-sm">{{ teamMembersErrorMessage }}</div>
+          </div>
+          <div class="flex items-center justify-between">
+            <button type="submit" class="bg-purple-700 text-white hover:bg-purple-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Modifier</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+  <!-- Projects List -->
+  <div class="overflow-x-auto relative shadow-md sm:rounded-lg">
+    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+      <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <tr>
+          <th scope="col" class="py-3 px-6">Nom</th>
+          <th scope="col" class="py-3 px-6">Description</th>
+          <th scope="col" class="py-3 px-6">Date de Début</th>
+          <th scope="col" class="py-3 px-6">Date de Fin</th>
+          <th scope="col" class="py-3 px-6">Mode</th>
+          <th scope="col" class="py-3 px-6">Status</th>
+          <th scope="col" class="py-3 px-6">Chef Matricule</th>
+          <th scope="col" class="py-3 px-6">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let projet of projets" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+          <td class="py-4 px-6">{{ projet.nom }}</td>
+          <td class="py-4 px-6">{{ projet.description }}</td>
+          <td class="py-4 px-6">{{ projet.dateDebut }}</td>
+          <td class="py-4 px-6">{{ projet.dateFin }}</td>
+          <td class="py-4 px-6">{{ projet.mode }}</td>
+          <td class="py-4 px-6" [ngClass]="{'text-green-500': projet.status === 'En cours', 'text-blue-500': projet.status === 'Terminé'}">{{ projet.status }}</td>
+          <td class="py-4 px-6">{{ projet.chefMatricule }}</td>
+          <td class="py-4 px-6">
+            <button class="text-blue-500 hover:text-blue-700" (click)="editProjet(projet)">
+              <img src="assets/images/file.png" alt="Edit" class="h-6 w-6">
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
